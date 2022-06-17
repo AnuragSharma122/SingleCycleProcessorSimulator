@@ -13,9 +13,6 @@ public class DataMemory {
     MainUI mainui;
     String[] memoryValue = new String[100];
     public DataMemory(MainUI mainui){
-        for(int i=0; i<100;i++){
-            memoryValue[i] = "0000 0000 0000 0000 0000 0000 0000 0000";
-        }
-        mainui.setMemoryWindow(memoryValue);
+
     }
 }

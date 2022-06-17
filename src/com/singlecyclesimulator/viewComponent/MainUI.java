@@ -7,7 +7,10 @@ import javax.swing.table.DefaultTableModel;
 import com.singlecyclesimulator.src.ControlPanel;
 import java.io.FileReader;
 import java.io.*;  
+import java.util.ArrayList;
+import java.util.Arrays;
 import javax.swing.JFileChooser;
+//import java.util.Scanner;
 
 //FileChooser ASM FILE from system
 class MyCustomFilter extends javax.swing.filechooser.FileFilter {
@@ -34,6 +37,7 @@ public class MainUI extends javax.swing.JFrame {
      * @param cr
      */
     public MainUI(ControlPanel cr) {
+        this.cr = cr;
         initComponents();
         myComponents();
     }
@@ -55,6 +59,64 @@ public class MainUI extends javax.swing.JFrame {
         jTable1.setDefaultEditor(Object.class, null);
         jTable2.setDefaultEditor(Object.class, null);
         jTable3.setDefaultEditor(Object.class, null);
+        setTable();
+    }
+    
+    public void setTable(){
+        jTable1.setModel(new DefaultTableModel(
+			new Object[][] {
+				{"00000", "$zero", 0, "0"},
+				{"00001", "$at", 0, "0"},
+				{"00010", "$v0", 0, "0"},
+				{"00011", "$v1", 0, "0"},
+				{"00100", "$a0", 0, "0"},
+				{"00101", "$a1", 0, "0"},
+				{"00110", "$a2", 0, "0"},
+				{"00111", "$a3", 0, "0"},
+				{"01000", "$t0", 0, "0"},
+				{"01001", "$t1", 0, "0"},
+				{"01010", "$t2", 0, "0"},
+				{"01011", "$t3", 0, "0"},
+				{"01100", "$t4", 0, "0"},
+				{"01101", "$t5", 0, "0"},
+				{"01110", "$t6", 0, "0"},
+				{"01111", "$t7", 0, "0"},
+				{"10000", "$s0", 0, "0"},
+				{"10001", "$s1", 0, "0"},
+				{"10010", "$s2", 0, "0"},
+				{"10011", "$s3", 0, "0"},
+				{"10100", "$s4", 0, "0"},
+				{"10101", "$s5", 0, "0"},
+				{"10110", "$s6", 0, "0"},
+				{"10111", "$s7", 0, "0"},
+				{"11000", "$t8", 0, "0"},
+				{"11001", "$t9", 0, "0"},
+				{"11010", "$k0", 0, "0"},
+				{"11011", "$k1", 0, "0"},
+				{"11100", "$gp", 0, "0"},
+				{"11101", "$sp", 0, "0"},
+				{"11110", "$fp", 0, "0"},
+				{"11111", "$ra", 0, "0"},
+			},
+			new String[] {
+				"Register(b)", "Register", "Data(d)", "Data(b)"
+			}
+		));
+        Object[][] table1 = new Object[100][3];
+        for(int i=0; i<100; i++){
+            table1[i][0] = i;
+            table1[i][1] = 0;
+            table1[i][2] = "0";
+        }
+        
+        jTable3.setModel(new DefaultTableModel(table1,new String[] {"Address", "Instruction", "Binary Value"}));
+        Object[][] table2 = new Object[65536][2];
+        for(int i=0; i<65536; i++){
+            table2[i][0] = Integer.toHexString(i);
+            table2[i][1] = "0";
+        }
+        jTable2.setModel(new DefaultTableModel(table2,new String[] {"Address", "Value"}));
+
     }
 
     /**
@@ -73,8 +135,10 @@ public class MainUI extends javax.swing.JFrame {
         jPanel3 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         textarea = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
+        assembleButton = new javax.swing.JButton();
+        runButton = new javax.swing.JButton();
+        stopButton = new javax.swing.JButton();
+        stepButton1 = new javax.swing.JButton();
         jTabbedPane3 = new javax.swing.JTabbedPane();
         jPanel6 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -139,21 +203,47 @@ public class MainUI extends javax.swing.JFrame {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane2.addTab("Assembler", jPanel3);
 
-        jButton1.setBackground(new java.awt.Color(196, 215, 234));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton1.setText("Assemble");
-        jButton1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(99, 130, 191), 2));
+        assembleButton.setBackground(new java.awt.Color(196, 215, 234));
+        assembleButton.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        assembleButton.setText("Assemble");
+        assembleButton.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(99, 130, 191), 2));
+        assembleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                assembleButtonActionPerformed(evt);
+            }
+        });
+
+        runButton.setText("Run");
+        runButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                runButtonActionPerformed(evt);
+            }
+        });
+
+        stopButton.setText("Step");
+        stopButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stopButtonActionPerformed(evt);
+            }
+        });
+
+        stepButton1.setText("Stop");
+        stepButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                stepButton1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -161,12 +251,19 @@ public class MainUI extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane2)
-                .addContainerGap())
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(179, 179, 179)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jTabbedPane2)
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(assembleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(97, 97, 97)
+                        .addComponent(runButton)
+                        .addGap(26, 26, 26)
+                        .addComponent(stepButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(stopButton)
+                        .addGap(52, 52, 52))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -174,30 +271,22 @@ public class MainUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jTabbedPane2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(assembleButton, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(runButton)
+                    .addComponent(stopButton)
+                    .addComponent(stepButton1))
                 .addContainerGap())
         );
 
         jTabbedPane1.addTab("Editor", jPanel1);
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 501, Short.MAX_VALUE)
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 582, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("Assembler", jPanel2);
 
         jTabbedPane3.setBackground(new java.awt.Color(200, 221, 242));
         jTabbedPane3.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(200, 221, 242), 3, true));
         jTabbedPane3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jTabbedPane3.setOpaque(true);
 
+        jTable1.setBackground(new java.awt.Color(204, 204, 255));
         jTable1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -254,19 +343,19 @@ public class MainUI extends javax.swing.JFrame {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE))
         );
 
         jTabbedPane3.addTab("Registers", jPanel6);
 
+        jTable2.setBackground(new java.awt.Color(255, 204, 204));
         jTable2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -391,19 +480,20 @@ public class MainUI extends javax.swing.JFrame {
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel10Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel10Layout.setVerticalGroup(
             jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel10Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         jTabbedPane3.addTab("Data Memory", jPanel10);
 
+        jTable3.setBackground(new java.awt.Color(204, 255, 204));
         jTable3.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {"0", null, null},
@@ -527,14 +617,14 @@ public class MainUI extends javax.swing.JFrame {
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -761,7 +851,7 @@ public class MainUI extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 513, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 525, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane3)
                 .addContainerGap())
@@ -769,14 +859,16 @@ public class MainUI extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(20, 20, 20)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane3)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTabbedPane1)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel1)))
-                .addContainerGap())
+                        .addComponent(jLabel1)
+                        .addGap(17, 17, 17))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jTabbedPane3)
+                        .addContainerGap())))
         );
 
         pack();
@@ -818,6 +910,7 @@ public class MainUI extends javax.swing.JFrame {
     private void pasteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteMenuItemActionPerformed
         // TODO add your handling code here:
         textarea.paste();
+        
     }//GEN-LAST:event_pasteMenuItemActionPerformed
 
     private void findMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_findMenuItemActionPerformed
@@ -854,43 +947,73 @@ public class MainUI extends javax.swing.JFrame {
 
     private void resetMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetMenuItemActionPerformed
         // TODO add your handling code here:
-        textarea.setText("");
+//        textarea.setText("");
+        setTable();
     }//GEN-LAST:event_resetMenuItemActionPerformed
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
-    
-    
+    private void assembleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assembleButtonActionPerformed
+        // TODO add your handling code here:
+        inputDataTextArea = new ArrayList<>(Arrays.asList(textarea.getText().split("\n")));
+        cr.loadcode(inputDataTextArea);
+    }//GEN-LAST:event_assembleButtonActionPerformed
+
+    private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
+        // TODO add your handling code here:
+        cr.operation("Start Execution");
+        
+    }//GEN-LAST:event_runButtonActionPerformed
+
+    private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
+        // TODO add your handling code here:
+        cr.operation("Step");
+    }//GEN-LAST:event_stopButtonActionPerformed
+
+    private void stepButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stepButton1ActionPerformed
+        // TODO add your handling code here:
+        cr.operation("Pause");
+    }//GEN-LAST:event_stepButton1ActionPerformed
+
+//    public int getValueOfRegister(){
+//        return 0;
+//    }
+//    
     //Getter and setter for Instruction Memory Tab
-    public void setInstructionMemoryWindow(String[] inst, String[] binaryInst){
+    public void updateInstructionMemoryWindow(String[] inst, String[] binaryInst){
         Object[][] newTable = new Object[100][3];
         for(int i=0 ; i<100; i++){
             newTable[i][0] = i;
-            newTable[i][1] = inst[i];
-            newTable[i][2] = binaryInst[i];
+            if(inst[i] == null){
+                newTable[i][1] =0;
+                newTable[i][2] = 0;
+            }else{
+                newTable[i][1] = inst[i];
+                newTable[i][2] = binaryInst[i];
+            }
         }
-        
+
         jTable3.setModel(new DefaultTableModel(newTable, new String[] {"Address", "Instruction", "Binary Value"}));
     }
-    public void setMemoryWindow(String[] memoryValue){
+    public void updatetMemoryWindow(String[] memoryValue){
         Object[][] newTable = new Object[100][2];
         for(int i=0; i<100; i++){
-            newTable[i][0] = i;
             newTable[i][1] = memoryValue[i];
         }
         jTable2.setModel(new DefaultTableModel(newTable, new String[] {"Address", "Value"}));
     }
-    public void setRegisterWindow(String[] regsBinary,String[] regs,String[] regsValue,String[] regsValueBinary){
-        Object[][] newTable = new Object[54][4];
-        for(int i=0; i<32; i++){
-            newTable[i][0] = regsBinary[i];
-            newTable[i][1] = regs[i];
-            newTable[i][2] = regsValue[i];
-            newTable[i][3] = regsValueBinary[i];
-        }
-        jTable1.setModel(new DefaultTableModel(newTable, new String[] {"Registers(B)", "Register","Data","Data(B)"}));
+    public void updateRegisterWindow(int[] regsValue,String[] regsValueBinary){
+        for (int i = 0; i < 32; i++) {
+            if(regsValueBinary[i] == null){
+                regsValue[i] = 0;
+                regsValueBinary[i] ="0";
+            }
+	    jTable1.setValueAt(regsValue[i], i, 2);
+	    jTable1.setValueAt(regsValueBinary[i], i, 3);
+	}
+//        jTable1.setModel(new DefaultTableModel(newTable, new String[] {"Registers(B)", "Register","Data","Data(B)"}));
     }
     private void OpenActionPerformed(java.awt.event.ActionEvent evt) {
     int returnVal = fileChooser.showOpenDialog(this);
@@ -905,6 +1028,10 @@ public class MainUI extends javax.swing.JFrame {
     } else {
         System.out.println("File access cancelled by user.");
     }
+    }
+    
+    public void highlightPC(int PC){
+        jTable3.setRowSelectionInterval(PC,PC);
     }
     /**
      * @param args the command line arguments
@@ -940,7 +1067,7 @@ public class MainUI extends javax.swing.JFrame {
 //            }
 //        });
 //    }
-    
+//    
 //    public static void build() {
 //        /* Set the Nimbus look and feel */
 //        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -974,11 +1101,11 @@ public class MainUI extends javax.swing.JFrame {
 //    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton assembleButton;
     private javax.swing.JMenuItem copyMenuItem;
     private javax.swing.JMenuItem cutMenuItem;
     private javax.swing.JFileChooser fileChooser;
     private javax.swing.JMenuItem findMenuItem;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -999,7 +1126,6 @@ public class MainUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -1017,8 +1143,14 @@ public class MainUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem redoMenuItem;
     private javax.swing.JMenuItem replaceMenuItem;
     private javax.swing.JMenuItem resetMenuItem;
+    private javax.swing.JButton runButton;
+    private javax.swing.JButton stepButton1;
+    private javax.swing.JButton stopButton;
     private javax.swing.JTextArea textarea;
     private javax.swing.JMenuItem undoMenuItem;
     // End of variables declaration//GEN-END:variables
-    private static ControlPanel cr;
+    public ControlPanel cr;
+    private String contentTextArea;
+    public ArrayList<String> inputDataTextArea;
+    public String[] Registers;
 }

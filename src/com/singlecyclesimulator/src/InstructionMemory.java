@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.singlecyclesimulator.src;
+import com.singlecyclesimulator.utilities.Utilities;
 import com.singlecyclesimulator.viewComponent.MainUI;
 /**
  *
@@ -12,16 +13,26 @@ import com.singlecyclesimulator.viewComponent.MainUI;
 public class InstructionMemory {
     MainUI mainui;
     
-    String[] instructions = new String[100];
-
-    String[] binaryInstructions = new String[100];
+    String[] instructions;
+    String[] binaryInstructions;
     
     public InstructionMemory(MainUI mainui){
-        for (int i = 0; i < 100; i++) {
-	    instructions[i] = "0";
-	    binaryInstructions[i] = "0000 0000 0000 0000 0000 0000 0000 0000";
+        this.mainui = mainui;
+        instructions = new String[100];
+        binaryInstructions = new String[100];
+    }
+    void store(int k, String data){
+      instructions[k] = data;
+      binaryInstructions[k] = Utilities.InstructionToBinaryConverter(data);
+        try {
+            mainui.updateInstructionMemoryWindow(instructions, binaryInstructions);
         }
-        mainui.setInstructionMemoryWindow(instructions, binaryInstructions);
+	catch(NullPointerException e) {
+	    System.out.println("NullPointerException thrown!");
+	}
+    }
+    public String load(int i){
+        return binaryInstructions[i];
     }
 }
 
